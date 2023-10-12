@@ -1,9 +1,16 @@
-import logo from "./logo.svg";
-import "./App.css";
+import { useState, useEffect, useRef } from 'react';
+import './App.css';
+// import { uploadFile } from './service/api';
 
 function App() {
   const logo =
     "https://i.pinimg.com/originals/16/46/24/1646243661201a0892cc4b1a64fcbacf.jpg";
+
+  const fileInputRef = useRef();
+  const onUploadClick = () => {
+    fileInputRef.current.click();
+  };
+
   return (
     <div className="container">
       <img src={logo} alt="banner" />
@@ -11,7 +18,13 @@ function App() {
         <h1>Simple file sharing!</h1>
         <p>Upload and share the download link.</p>
 
-        <button>Upload</button>
+        <button onClick={() => onUploadClick()}>Upload</button>
+        <input
+          type="file"
+          ref={fileInputRef}
+          style={{ display: "none" }}
+          // onChange={(e) => setFile(e.target.files[0])}
+        />
       </div>
     </div>
   );
