@@ -1,0 +1,565 @@
+STIL   1.00;
+
+Header {
+NVMe Test Flow Demonstration
+}
+DutConfig {
+	TMName .\tp_nvme.so;
+}
+Bin "PASSALL"{
+	ProgramResult = "Pass";
+	BinNumber =    1;
+}
+Bin "FAIL"{
+	ProgramResult = "Fail";
+	BinNumber =    2;
+}
+Bin "FailPowerUp"{
+	ProgramResult = "Fail";
+	BinNumber =   10;
+}
+Bin "FailPowerDown"{
+	ProgramResult = "Fail";
+	BinNumber =   80;
+}
+Bin "MiscFail"{
+	ProgramResult = "Fail";
+	BinNumber =   21;
+}
+Bin "NamespaceAttachFail"{
+	ProgramResult = "Fail";
+	BinNumber =   65;
+}
+Bin "NamespaceMgnFail"{
+	ProgramResult = "Fail";
+	BinNumber =   66;
+}
+Bin "NamespaceMgnCapCheck"{
+	ProgramResult = "Fail";
+	BinNumber =   70;
+}
+Bin "IOFail"{
+	ProgramResult = "Fail";
+	BinNumber =   20;
+}
+Bin "ns_fail_to_default_state"{
+	ProgramResult = "Fail";
+	BinNumber =   91;
+}
+TestParams DeviceOpen{
+	Method tm_delay {"TestLabel" "Adding a delay";"Delay" 15;}
+	Method tm_open_device {"TestLabel" "Device Open";"TestDlog" DLOG_RESULT;"Delay" 1;}
+}
+TestParams DeviceClose{
+	Method tm_close_device {"TestLabel" "Device Close";"TestDlog" DLOG_RESULT;}
+}
+TestParams PowerOffPCIeDevice{
+	Method tm_power_off_pcie_device {"TestLabel" "Power_Off_PCIe_Device";"TestDlog" DLOG_RESULT;"PSMeasTriggerType" TRIGGER_DELAY_Sec;"PSMeasTriggerValue" 0.0;"PSMeasSampleInterval_Sec" '0.00005s';"PSMeasTotalSamples" 1024;"DoMonitor" False;"MonitorThis" MeasCurrentList_3p3V;}
+}
+TestParams InitLoopCounter0{
+	Method tm_loop_counter_initial_value {"TestLabel" "InitLoopCounter0";"TestDlog" DLOG_RESULT;"LoopCounterName" LOOPCNT_0;"LoopCounterInitialVal" 0;}
+}
+TestParams LoopCounterDisplay{
+	Method tm_loop_counter_display_current_value {"TestLabel" "LoopCounterDisplay";"TestDlog" DLOG_DETAIL_RESULT;"LoopCounterName" LOOPCNT_0;}
+}
+TestParams TCDT_CaptureStart{
+	Method tm_tcdt_capture {"TestLabel" "TCDT (TLP) Capture Start";"TestDlog" DLOG_DETAIL_RESULT;"CaptureOption" START;"PurgeLogs" Purge;}
+}
+TestParams TCDT_CaptureStop{
+	Method tm_tcdt_capture {"TestLabel" "TCDT (TLP) Capture Stop and Dump";"TestDlog" DLOG_DETAIL_RESULT;"CaptureOption" STOP_DUMP;"PurgeLogs" Keep_Logs;}
+}
+TestParams KnownGoodState{
+	Method tm_close_device {"TestLabel" "Close Device";"TestDlog" DLOG_RESULT;}
+	Method tm_power_off_pcie_device {"TestLabel" "Power_Off_PCIe_Device";"TestDlog" DLOG_RESULT;"PSMeasTriggerType" TRIGGER_DELAY_Sec;"PSMeasTriggerValue" 0.0;"PSMeasSampleInterval_Sec" '0.00005s';"PSMeasTotalSamples" 1;"DoMonitor" False;"MonitorThis" MeasCurrentList_3p3V;}
+	Method tm_select_port {"Enabled" False;"TestLabel" "Ensure that dual port is disabled";"TestDlog" DLOG_ALL;"Port" NO_DUAL_PORT;}
+}
+TestParams Initialize{
+	Method tm_cmdlog_enable_set {"TestLabel" "Command Log Enable Set";"TestDlog" DLOG_RESULT;"CMDLOG_EN" ENABLE;}
+	Method tm_cmdlog_reset {}
+	Method tm_fa_cmd_timeout_set {"Enabled" False;"TestLabel" "FA Command Timeout Set";"TestDlog" DLOG_UNCHANGED;"FA_COMMAND_TIMEOUT_USEC" 30000000;"FA_COMMAND_TIMEOUT" ENABLE;}
+	Method tm_fa_cmdlog_configure_set {"Enabled" False;"TestLabel" "FA Command Log Configure Set";"TestDlog" DLOG_UNCHANGED;"FACMDLOG_EN" ENABLE;"FALOG_WRAP_AROUND" ENABLE;"TRIG_EVENT" TRIG_NONE;"SNAP_SIZE" SNAP_8;"POST_TRIG_COUNT" 7;}
+	Method tm_fa_cmdlog_clear {"Enabled" False;"TestLabel" "FA Command Log Clear";"TestDlog" DLOG_UNCHANGED;}
+	Method tm_fa_cmd_log_option_display {"Enabled" False;"TestLabel" "FA Display Command Log Options";"TestDlog" DLOG_DETAIL_RESULT;}
+	Method tm_counters_reset_pcie_aer_downstream {}
+}
+TestParams PowerOnPCIe{
+	Method tm_power_on_pcie_device {"TestLabel" "Power On PCIe Device";"TestDlog" DLOG_ALL;"MeasCurrentList_3p3V" '#';"MeasCurrentList_12V" '#';"MeasVoltageList_3p3V" '#';"MeasVoltageList_12V" '#';"StylusResult" #;"DoMonitor" True;"MonitorThis" MeasVoltageList_12V;}
+}
+TestParams PCIe_Link_Status_Display{
+	Method tm_display_pcie_link_status {"TestLabel" "PCIe_Link_Status";"TestDlog" DLOG_ALL;}
+}
+TestParams {
+	Method tm_power_on_pcie_device {"TestLabel" "Power_On_PCIe_Device";"TestDlog" DLOG_RESULT;"EnumMode" ENUM_FULL;"PSMeasTriggerType" TRIGGER_MAX_VOLTAGE_v;"PSMeasTriggerValue" 0.9;"PSMeasSampleInterval_Sec" '0.001s';"PSMeasTotalSamples" 1024;"MaxRetrain" 5;"LinkGen" MAXIMUM;"LinkMatchRequired" NO;"DoMonitor" False;"MonitorThis" MeasCurrentList_3p3V;}
+}
+TestParams IdentifyDevice{
+	Method tm_identify_device {"TestLabel" "Identify Device";"TestDlog" DLOG_ALL;"ModelNumber" "DoNotCare";"FirmwareRevision" "DoNotCare";}
+}
+TestParams LoopCounterBranch{
+	Method tm_loop_counter_increase_index_and_branch {"TestLabel" "LoopCounterBranch";"TestDlog" DLOG_RESULT;"LoopCounterName" LOOPCNT_0;"MaxCounterValue" 1;}
+	Method tm_loop_counter_branch_on_time {"Enabled" False;"TestLabel" "LoopTimeBranch";"TestDlog" DLOG_RESULT;"LoopCounterName" LOOPCNT_0;"MaxRunTime_sec" '120s';}
+}
+TestParams PowerOnPCIeDevice{
+	Method tm_power_on_pcie_device {"TestLabel" "Power_On_PCIe_Device";"TestDlog" DLOG_RESULT;"EnumMode" ENUM_FULL;"PSMeasTriggerType" TRIGGER_MAX_VOLTAGE_v;"PSMeasTriggerValue" 0.9;"PSMeasSampleInterval_Sec" '0.001s';"PSMeasTotalSamples" 1024;"MaxRetrain" 5;"LinkGen" MAXIMUM;"LinkMatchRequired" NO;"DoMonitor" False;"MonitorThis" MeasCurrentList_3p3V;}
+}
+TestParams NSCapabilityCheck{
+	Method tm_nvme_namespace_management_capability_check {"TestLabel" "Namespace Management check";"TestDlog" DLOG_DETAIL_RESULT;}
+}
+TestParams NS_Create_Delete_Check_Common{
+	Method tm_select_port {"Enabled" False;"TestDlog" DLOG_ALL;"Port" PORT_A;}
+	Method tm_power_on_pcie_device {"TestLabel" "Power_On_PCIe_Device";"TestDlog" DLOG_UNCHANGED;"EnumMode" ENUM_PARTIAL;"PSMeasTriggerType" TRIGGER_MAX_VOLTAGE_v;"PSMeasTriggerValue" 0.9;"PSMeasSampleInterval_Sec" '0.001s';"PSMeasTotalSamples" 1024;"MaxRetrain" 5;"LinkGen" MAXIMUM;"LinkMatchRequired" NO;"DoMonitor" False;"MonitorThis" MeasCurrentList_3p3V;}
+	Method tm_open_device {"TestLabel" "Open Device";"TestDlog" DLOG_UNCHANGED;"Delay" 1;}
+	Method tm_manual_nvme_namespace_management_common {"TestDlog" DLOG_UNCHANGED;"Delete" DELETE;"nsSize" 0;"nsCapacity" 0;"nsID" 0xFFFFFFFF;"fLBASize" 0;"dataProtection" 0;"nsMultiPath" 0;}
+	Method tm_manual_nvme_namespace_management_common {"TestDlog" DLOG_UNCHANGED;"Delete" CREATE;"nsSize" 0x100000;"nsCapacity" 0x100000;"nsID" 1;"fLBASize" 0;"dataProtection" 0;"nsMultiPath" 0;}
+	Method tm_manual_nvme_namespace_attach {"TestDlog" DLOG_UNCHANGED;"Detach" ATTACH;"nsID" 1;}
+	Method tm_manual_nvme_namespace_management_common {"TestDlog" DLOG_UNCHANGED;"Delete" CREATE;"nsSize" 0x100000;"nsCapacity" 0x100000;"nsID" 2;"fLBASize" 0;"dataProtection" 0;"nsMultiPath" 0;}
+	Method tm_manual_nvme_namespace_attach {"TestDlog" DLOG_UNCHANGED;"Detach" ATTACH;"nsID" 2;}
+	Method tm_manual_nvme_namespace_management_common {"TestDlog" DLOG_UNCHANGED;"Delete" CREATE;"nsSize" 0x100000;"nsCapacity" 0x100000;"nsID" 3;"fLBASize" 0;"dataProtection" 0;"nsMultiPath" 0;}
+	Method tm_manual_nvme_namespace_attach {"TestDlog" DLOG_UNCHANGED;"Detach" ATTACH;"nsID" 3;}
+	Method tm_manual_nvme_namespace_management_common {"TestDlog" DLOG_UNCHANGED;"Delete" CREATE;"nsSize" 0x100000;"nsCapacity" 0x100000;"nsID" 4;"fLBASize" 0;"dataProtection" 0;"nsMultiPath" 0;}
+	Method tm_manual_nvme_namespace_attach {"TestDlog" DLOG_UNCHANGED;"Detach" ATTACH;"nsID" 4;}
+}
+TestParams NVMeControllerReset{
+	Method tm_nvme_controller_reset {"TestLabel" "NVMe controller Reset";"TestDlog" DLOG_ALL;}
+	Method tm_nvme_get_controller_identify_data {"TestLabel" "Check to ensure the drive is up";"TestDlog" DLOG_RESULT;}
+	Method tm_identify_device {"TestLabel" "Identify Device";"TestDlog" DLOG_RESULT;}
+}
+TestParams NVMePowerCycle{
+	Method tm_close_device {"TestLabel" "Device Close";"TestDlog" DLOG_RESULT;}
+	Method tm_power_off_pcie_device {"TestLabel" "Power_Off_PCIe_Device";"TestDlog" DLOG_RESULT;"PSMeasTriggerType" TRIGGER_DELAY_Sec;"PSMeasTriggerValue" 0.0;"PSMeasSampleInterval_Sec" '0.00005s';"PSMeasTotalSamples" 1024;"DoMonitor" False;"MonitorThis" MeasCurrentList_3p3V;}
+	Method tm_power_off_pcie_device {"TestLabel" "Power_Off_PCIe_Device";"TestDlog" DLOG_RESULT;"PSMeasTriggerType" TRIGGER_DELAY_Sec;"PSMeasTriggerValue" 0.0;"PSMeasSampleInterval_Sec" '0.00005s';"PSMeasTotalSamples" 1;"DoMonitor" False;"MonitorThis" MeasCurrentList_3p3V;}
+	Method tm_power_on_pcie_device {"TestLabel" "Power_On_PCIe_Device";"TestDlog" DLOG_RESULT;"EnumMode" ENUM_FULL;"PSMeasTriggerType" TRIGGER_MAX_VOLTAGE_v;"PSMeasTriggerValue" 0.9;"PSMeasSampleInterval_Sec" '0.001s';"PSMeasTotalSamples" 1024;"MaxRetrain" 5;"LinkGen" MAXIMUM;"LinkMatchRequired" NO;"DoMonitor" False;"MonitorThis" MeasCurrentList_3p3V;}
+	Method tm_delay {"TestLabel" "Adding a delay";"Delay" 15;}
+	Method tm_open_device {"TestLabel" "Device Open";"TestDlog" DLOG_RESULT;"Delay" 1;}
+}
+TestParams multiple_namespace{
+	Method tm_identify_device {"TestLabel" "Identify Device";"TestDlog" DLOG_DETAIL_RESULT;}
+	Method tm_multiple_namespace {"TestLabel" "multiple_namespace";"TestDlog" DLOG_ALL;"perfTimeout_sec" 300;"u64StartTargetLBA_NS_1" 0;"u64EndTargetLBA_NS_1" 0xFFFFF;"u64NumBlockTested_NS_1" 100000000;"u64ReadPercentage_NS_1" 100;"u64BlkSizeInLBA_NS_1" 8;"u64StartTargetLBA_NS_2" 0;"u64EndTargetLBA_NS_2" 0xFFFFF;"u64NumBlockTested_NS_2" 100000000;"u64ReadPercentage_NS_2" 100;"u64BlkSizeInLBA_NS_2" 1;"u64StartTargetLBA_NS_3" 0;"u64EndTargetLBA_NS_3" 0xFFFFF;"u64NumBlockTested_NS_3" 100000000;"u64ReadPercentage_NS_3" 100;"u64BlkSizeInLBA_NS_3" 2;"u64StartTargetLBA_NS_4" 0;"u64EndTargetLBA_NS_4" 0xFFFFF;"u64NumBlockTested_NS_4" 100000000;"u64ReadPercentage_NS_4" 0;"u64BlkSizeInLBA_NS_4" 4;}
+}
+TestParams namespace_default_state{
+	Method tm_manual_nvme_namespace_management_common {"TestDlog" DLOG_UNCHANGED;"Delete" DELETE;"nsSize" 0;"nsCapacity" 0;"nsID" 0xFFFFFFFF;"fLBASize" 0;"dataProtection" 0;"nsMultiPath" 0;}
+	Method tm_manual_nvme_namespace_management_restore {"TestDlog" DLOG_UNCHANGED;"Delete" CREATE;"nsID" 1;"fLBASize" 0;"dataProtection" 0;"nsMultiPath" 0;}
+	Method tm_manual_nvme_namespace_attach {"TestDlog" DLOG_UNCHANGED;"Detach" ATTACH;"nsID" 1;}
+}
+TestParams PowerOffPCIeDevice_copy0{
+	Method tm_power_off_pcie_device {"TestLabel" "Power_Off_PCIe_Device";"TestDlog" DLOG_RESULT;"PSMeasTriggerType" TRIGGER_DELAY_Sec;"PSMeasTriggerValue" 0;"PSMeasSampleInterval_Sec" '  50us';"PSMeasTotalSamples" 1024;"DoMonitor" False;"MonitorThis" MeasCurrentList_3p3V;}
+}
+TestParams PowerOnPCIeDevice_copy0{
+	Method tm_power_on_pcie_device {"TestLabel" "Power_On_PCIe_Device";"TestDlog" DLOG_RESULT;"EnumMode" ENUM_FULL;"PSMeasTriggerType" TRIGGER_MAX_VOLTAGE_v;"PSMeasTriggerValue" 0.9;"PSMeasSampleInterval_Sec" '   1ms';"PSMeasTotalSamples" 1024;"MaxRetrain" 5;"LinkGen" MAXIMUM;"LinkMatchRequired" NO;"LinkStepsDelayMSec_Opt" _DEFAULT;"BlockDeviceWaitTimeSec_Opt" _DEFAULT;"MaxPERSTtoIdentify" '  15s';"DoMonitor" False;"MonitorThis" MeasCurrentList_3p3V;}
+}
+TestParams PowerOffPCIeDevice_copy1{
+	Method tm_power_off_pcie_device {"TestLabel" "Power_Off_PCIe_Device";"TestDlog" DLOG_RESULT;"PSMeasTriggerType" TRIGGER_DELAY_Sec;"PSMeasTriggerValue" 0;"PSMeasSampleInterval_Sec" '  50us';"PSMeasTotalSamples" 1024;"DoMonitor" False;"MonitorThis" MeasCurrentList_3p3V;}
+}
+TestParams PowerOnPCIeDevice_copy1{
+	Method tm_power_on_pcie_device {"TestLabel" "Power_On_PCIe_Device";"TestDlog" DLOG_RESULT;"EnumMode" ENUM_FULL;"PSMeasTriggerType" TRIGGER_MAX_VOLTAGE_v;"PSMeasTriggerValue" 0.9;"PSMeasSampleInterval_Sec" '   1ms';"PSMeasTotalSamples" 1024;"MaxRetrain" 5;"LinkGen" MAXIMUM;"LinkMatchRequired" NO;"LinkStepsDelayMSec_Opt" _DEFAULT;"BlockDeviceWaitTimeSec_Opt" _DEFAULT;"MaxPERSTtoIdentify" '  15s';"DoMonitor" False;"MonitorThis" MeasCurrentList_3p3V;}
+}
+TestParams refresh_State{
+	Method tm_close_device {"TestLabel" "Close Device";"TestDlog" DLOG_RESULT;}
+	Method tm_power_off_pcie_device {"TestLabel" "Power_Off_PCIe_Device";"TestDlog" DLOG_RESULT;"PSMeasTriggerType" TRIGGER_DELAY_Sec;"PSMeasTriggerValue" 0.0;"PSMeasSampleInterval_Sec" '0.00005s';"PSMeasTotalSamples" 1;"DoMonitor" False;"MonitorThis" MeasCurrentList_3p3V;}
+	Method tm_select_port {"Enabled" False;"TestLabel" "Ensure that dual port is disabled";"TestDlog" DLOG_ALL;"Port" NO_DUAL_PORT;}
+	Method tm_power_on_pcie_device {"TestLabel" "Power_On_PCIe_Device";"TestDlog" DLOG_RESULT;"EnumMode" ENUM_FULL;"PSMeasTriggerType" TRIGGER_MAX_VOLTAGE_v;"PSMeasTriggerValue" 0.9;"PSMeasSampleInterval_Sec" '0.001s';"PSMeasTotalSamples" 1024;"MaxRetrain" 5;"LinkGen" MAXIMUM;"LinkMatchRequired" NO;"DoMonitor" False;"MonitorThis" MeasCurrentList_3p3V;}
+	Method tm_delay {"TestLabel" "Adding a delay";"Delay" 15;}
+	Method tm_open_device {}
+}
+TestParams NN_check{
+	Method tm_manual_nvme_check_MNAN {"TestLabel" "NN_check";"TestDlog" DLOG_ALL;}
+}
+TestParams ZNS_check{
+	Method identify_ZNS_drive {"TestLabel" "ZNS_check";"TestDlog" DLOG_ALL;}
+}
+TestParams Test_tm_perf_test_percent{
+	Method tm_perf_sw_test {"TestLabel" "TestWrite";"TestDlog" DLOG_ALL;"StartTargetLBA" 0;"EndTargetLBA" -1;"BlkSizeInLBA" _128;"NumBlockTested" 2000;"ReadPercentage" 0;"RandomAddressPercentage" 0;"AlignLBA_Opt" 128;"NCQ_Opt" 8;"RandomSeed_Opt" -1;"InitialDataValue_Opt" -1;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataGenType_Opt" USER_BUFFER_DATA;"BufferData_Opt" BufPat_RANDOM;"EntropyPercent" 50;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_test_percent {}
+}
+TestParams Test_tm_perf_test{
+	Method tm_perf_sw_test {"TestLabel" "TestWrite";"TestDlog" DLOG_ALL;"StartTargetLBA" 0;"EndTargetLBA" -1;"BlkSizeInLBA" _128;"NumBlockTested" 2000;"ReadPercentage" 0;"RandomAddressPercentage" 0;"AlignLBA_Opt" 128;"NCQ_Opt" 8;"RandomSeed_Opt" -1;"InitialDataValue_Opt" -1;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataGenType_Opt" USER_BUFFER_DATA;"BufferData_Opt" BufPat_RANDOM;"EntropyPercent" 50;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_test {}
+}
+TestParams Test_tm_perf_hw_test{
+	Method tm_perf_hw_test {"TestLabel" "Test_tm_perf_hw_test || Seq Write Bandwidth";"TestDlog" DLOG_RESULT;"StartTargetLBA" 0;"EndTargetLBA" 80000000;"BlkSizeInLBA" _2048;"NumBlockTested" 8000;"ReadPercentage" 0;"RandomAddressPercentage" 0;"AlignLBA_Opt" 8;"NCQ_Opt" 128;"RandomSeed_Opt" 1;"InitialDataValue_Opt" 12345678;"DataXORMask_Opt" -1;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_PSEUDO_RANDOM;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_INVERT_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" ENABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+}
+TestParams Test_tm_perf_hw_test_percent{
+	Method tm_perf_hw_test_percent {"TestLabel" "Test_tm_perf_hw_test_percent || SeqWrt100";"TestDlog" DLOG_DETAIL;"StartTargetLBA" 0;"EndTargetLBA" -1;"BlkSizeInLBA" _2048;"TargetLBAPercentage" 1;"ReadPercentage" 0;"RandomAddressPercentage" 0;"AlignLBA_Opt" 8;"NCQ_Opt" 32;"RandomSeed_Opt" 8396439025536758151;"InitialDataValue_Opt" -1;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_PSEUDO_RANDOM;"DataXOR_Opt" XOR_INVERT_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 1800;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;"ReadIOps_Out" #;"ReadMBps_Out" #;"WriteIOps_Out" #;"WriteMBps_Out" #;"AvgWriteLatency_Out" #;"AvgReadLatency_Out" #;"MaxWriteLatency_Out" #;"MaxReadLatency_Out" #;"StylusResult" #;}
+}
+TestParams Test_tm_perf_fa_wrc_test_n_percent{
+	Method tm_fa_cmdlog_clear {"TestLabel" "Clear FA Command Log";"TestDlog" DLOG_RESULT;}
+	Method tm_perf_hw_test {"TestLabel" "Basic Write Test";"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 250069680;"BlkSizeInLBA" _8;"NumBlockTested" 100;"ReadPercentage" 0;"RandomAddressPercentage" 0;"AlignLBA_Opt" 8;"NCQ_Opt" 8;"RandomSeed_Opt" 13243214141;"InitialDataValue_Opt" 432143214145;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_PSEUDO_RANDOM;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestLabel" "Basic Read Test";"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 250069680;"BlkSizeInLBA" _8;"NumBlockTested" 100;"ReadPercentage" 100;"RandomAddressPercentage" 0;"AlignLBA_Opt" 8;"NCQ_Opt" 8;"RandomSeed_Opt" 13243214141;"InitialDataValue_Opt" 432143214145;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_PSEUDO_RANDOM;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_DATA;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_fa_wrc_test {"TestLabel" "FA WriteRead SubCount1";"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 250069680;"BlkSizeInLBA" _1;"NumBlockTested" 4096;"WrRdCmpFASubCount" 1;"RandomAddressPercentage" 0;"AlignLBA_Opt" 8;"NCQ_Opt" 8;"RandomSeed_Opt" -1;"InitialDataValue_Opt" -1;"DataXORMask_Opt" 2497647115;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_FIX_VALUE;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_fa_wrc_test {"TestLabel" "FA WriteRead SubCount2";"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 250069680;"BlkSizeInLBA" _1;"NumBlockTested" 4096;"WrRdCmpFASubCount" 4;"RandomAddressPercentage" 0;"AlignLBA_Opt" 8;"NCQ_Opt" 8;"RandomSeed_Opt" -1;"InitialDataValue_Opt" -1;"DataXORMask_Opt" 2497647115;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_FIX_VALUE;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_fa_wrc_test_percent {"Enabled" False;"TestLabel" "FA WriteRead SubCount Percent1";"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 250069680;"BlkSizeInLBA" _1;"TargetLBAPercentage" 1;"WrRdCmpFASubCount" 1;"RandomAddressPercentage" 0;"AlignLBA_Opt" 8;"NCQ_Opt" 8;"RandomSeed_Opt" -1;"InitialDataValue_Opt" -1;"DataXORMask_Opt" 2497647115;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_FIX_VALUE;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_fa_wrc_test_percent {"Enabled" False;"TestLabel" "FA WriteRead SubCount Percent2";"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 250069680;"BlkSizeInLBA" _1;"TargetLBAPercentage" 1;"WrRdCmpFASubCount" 4;"RandomAddressPercentage" 0;"AlignLBA_Opt" 8;"NCQ_Opt" 8;"RandomSeed_Opt" -1;"InitialDataValue_Opt" -1;"DataXORMask_Opt" 2497647115;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_FIX_VALUE;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+}
+TestParams Test_tm_perf_enterprise_jedec{
+	Method tm_perf_enterprise_jedec {}
+}
+TestParams Test_tm_hw_user_write_buffer_set{
+	Method tm_hw_user_write_buffer_set {"TestLabel" "Seq Write Bandwidth";"TestDlog" DLOG_RESULT;"DataFileName" "/home/tester/userfiles/4MB_rand.bin";}
+	Method tm_perf_fa_wrc_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"WrRdCmpFASubCount" 1;"RandomAddressPercentage" 0;"AlignLBA_Opt" 8;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 0;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 0;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 0;"AlignLBA_Opt" 1;"NCQ_Opt" 16;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 0;"AlignLBA_Opt" 1;"NCQ_Opt" 16;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 0;"AlignLBA_Opt" 1;"NCQ_Opt" 32;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 0;"AlignLBA_Opt" 1;"NCQ_Opt" 32;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 0;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_NONE;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 0;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_NONE;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 0;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_ONLY;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 0;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_ONLY;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 0;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_END_ONLY;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 0;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_END_ONLY;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _8;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 0;"AlignLBA_Opt" 8;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _8;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 0;"AlignLBA_Opt" 8;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _16;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 0;"AlignLBA_Opt" 16;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _16;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 0;"AlignLBA_Opt" 16;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _256;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 0;"AlignLBA_Opt" 256;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _256;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 0;"AlignLBA_Opt" 256;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 0;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_INVERT_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 0;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_INVERT_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 0;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_32BIT_STRIPE_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 0;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_32BIT_STRIPE_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 0;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_64_BIT_STRIPE_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 0;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_64_BIT_STRIPE_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_fa_wrc_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"WrRdCmpFASubCount" 1;"RandomAddressPercentage" 100;"AlignLBA_Opt" 8;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 100;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 100;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 100;"AlignLBA_Opt" 1;"NCQ_Opt" 16;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 100;"AlignLBA_Opt" 1;"NCQ_Opt" 16;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 100;"AlignLBA_Opt" 1;"NCQ_Opt" 32;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 100;"AlignLBA_Opt" 1;"NCQ_Opt" 32;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 100;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_NONE;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 100;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_NONE;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 100;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_ONLY;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 100;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_ONLY;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 100;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_END_ONLY;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 100;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_END_ONLY;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _8;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 100;"AlignLBA_Opt" 8;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _8;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 100;"AlignLBA_Opt" 8;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _16;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 100;"AlignLBA_Opt" 16;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _16;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 100;"AlignLBA_Opt" 16;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _256;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 100;"AlignLBA_Opt" 256;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _256;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 100;"AlignLBA_Opt" 256;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 100;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_INVERT_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 100;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_INVERT_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 100;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_32BIT_STRIPE_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 100;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_32BIT_STRIPE_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 100;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_64_BIT_STRIPE_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 100;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_64_BIT_STRIPE_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_hw_user_write_buffer_set {"TestLabel" "Seq Write Bandwidth";"TestDlog" DLOG_RESULT;"DataFileName" "/home/tester/userfiles/MyFileTransferTest.txt";}
+	Method tm_perf_fa_wrc_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"WrRdCmpFASubCount" 1;"RandomAddressPercentage" 0;"AlignLBA_Opt" 8;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 0;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 0;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 0;"AlignLBA_Opt" 1;"NCQ_Opt" 16;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 0;"AlignLBA_Opt" 1;"NCQ_Opt" 16;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 0;"AlignLBA_Opt" 1;"NCQ_Opt" 32;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 0;"AlignLBA_Opt" 1;"NCQ_Opt" 32;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 0;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_NONE;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 0;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_NONE;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 0;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_ONLY;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 0;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_ONLY;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 0;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_END_ONLY;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 0;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_END_ONLY;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _8;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 0;"AlignLBA_Opt" 8;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _8;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 0;"AlignLBA_Opt" 8;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _16;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 0;"AlignLBA_Opt" 16;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _16;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 0;"AlignLBA_Opt" 16;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _256;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 0;"AlignLBA_Opt" 256;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _256;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 0;"AlignLBA_Opt" 256;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 0;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_INVERT_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 0;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_INVERT_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 0;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_32BIT_STRIPE_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 0;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_32BIT_STRIPE_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 0;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_64_BIT_STRIPE_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 0;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_64_BIT_STRIPE_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_fa_wrc_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"WrRdCmpFASubCount" 1;"RandomAddressPercentage" 100;"AlignLBA_Opt" 8;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 100;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 100;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 100;"AlignLBA_Opt" 1;"NCQ_Opt" 16;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 100;"AlignLBA_Opt" 1;"NCQ_Opt" 16;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 100;"AlignLBA_Opt" 1;"NCQ_Opt" 32;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 100;"AlignLBA_Opt" 1;"NCQ_Opt" 32;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 100;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_NONE;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 100;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_NONE;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 100;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_ONLY;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 100;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_ONLY;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 100;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_END_ONLY;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 100;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_END_ONLY;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _8;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 100;"AlignLBA_Opt" 8;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _8;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 100;"AlignLBA_Opt" 8;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _16;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 100;"AlignLBA_Opt" 16;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _16;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 100;"AlignLBA_Opt" 16;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _256;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 100;"AlignLBA_Opt" 256;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _256;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 100;"AlignLBA_Opt" 256;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_PIDA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_FIX_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 100;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_INVERT_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 100;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_INVERT_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 100;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_32BIT_STRIPE_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 100;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_32BIT_STRIPE_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 0;"RandomAddressPercentage" 100;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_64_BIT_STRIPE_MASK;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataFMLog_Opt" LOG_ALL_DATA_WRITE;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+	Method tm_perf_hw_test {"TestDlog" DLOG_UNCHANGED;"StartTargetLBA" 0;"EndTargetLBA" 8e+05;"BlkSizeInLBA" _1;"NumBlockTested" 10000;"ReadPercentage" 100;"RandomAddressPercentage" 100;"AlignLBA_Opt" 1;"NCQ_Opt" 8;"RandomAddressMode_Opt" LFSR_MODE;"RandomSeed_Opt" -1;"InitialDataValue_Opt" 0x0000000000000000;"DataXORMask_Opt" 0;"DataMode_Opt" HW_FA_APG;"DataPattern_Opt" PAT_USER_BUFFER;"LBAOverlay_Opt" LBA_OVERLAY_START_AND_END;"DataXOR_Opt" XOR_64_BIT_STRIPE_MASK;"DataCompare_Opt" DATA_COMPARE_ENABLE;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;"Loops_Opt" 1;"Timeout_Opt" 0;"ErrorLimit_Opt" 0;"StorePerfResult_Opt" DISABLE_STORE_PERF_RESULT;"ShmooTimePoint" 0;"ReadIOpsLowLimit" 0;"ReadMBpsLowLimit" 0;"WriteIOpsLowLimit" 0;"WriteMBpsLowLimit" 0;}
+}
+TestParams Test_tm_performance_test_init{
+	Method tm_performance_test_init {}
+}
+TestParams Test_tm_performance_test_summary{
+	Method tm_performance_test_summary {"TestLabel" "Test_tm_performance_test_summary";"ReadIOpsLowQLimit" 100;"ReadIOpsMediumQLimit" 150;"ReadIOpsHighQLimit" 200;"WriteIOpsLowQLimit" 100;"WriteIOpsMediumQLimit" 150;"WriteIOpsHighQLimit" 200;"ReadMBpsLowQLimit" 100;"ReadMBpsMediumQLimit" 150;"ReadMBpsHighQLimit" 500;"WriteMBpsLowQLimit" 100;"WriteMBpsMediumQLimit" 150;"WriteMBpsHighQLimit" 500;}
+}
+TestParams Test_tm_j219a_ent_n_sequential{
+	Method tm_j219a_ent {"TestLabel" "Test_tm_j219a_ent_n_sequential";"TestDlog" DLOG_UNCHANGED;"J219_Minute" 5;"EntropyPercent" 50;"RandomSeed_Opt" -1;"ReadPercentage" 100;"RandomAddressPercentage" 0;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataGenMode_Opt" HW_PIDA_APG;"DataFMLog_Opt" FM_LOG_FAIL_COMPARE_LBA_BIT_COUNT;}
+	Method tm_j219a_ent_sequential {"TestLabel" "J219a SEQ";"TestDlog" DLOG_UNCHANGED;"QueueDepth" 32;"EntropyPercent" 50;"RandomSeed_Opt" -1;"ReadWriteMode" WriteFirstThenRead;"ReadPercentage" 50;"RandomAddressPercentage" 0;"TotalOps" 10000000;"DataCompare_Opt" DATA_COMPARE_DISABLE;"DataGenMode_Opt" HW_PIDA_APG;}
+}
+TestParams Test_tm_init_workload{
+	Method tm_init_workload {"TestLabel" "Test_tm_init_workload";"TestDlog" DLOG_UNCHANGED;"WorkloadTime" 5;}
+}
+TestParams Test_tm_perf_time_temp_dps_test{
+	Method tm_perf_time_temp_dps_test {"TestLabel" "Test_tm_perf_time_temp_dps_test";"TestDlog" DLOG_UNCHANGED;}
+}
+TestParams Test_tm_perf_snia_test{
+	Method tm_perf_snia_test {"TestLabel" "Test_tm_perf_snia_test";"TestDlog" DLOG_UNCHANGED;}
+}
+TestParams Test_Check_SB{
+	Method tm_sb_mode_get {}
+	Method tm_sb_direction_get {"TestLabel" "Get SB pin direction";"TestDlog" DLOG_UNCHANGED;"PIN_NUMBER" 0;}
+	Method tm_sb_pull_level_get {}
+	Method tm_sb_value_get {}
+	Method tm_ux_mode_get {}
+}
+ProgSeq "Main"{
+	 UserKeywords StrictTypeChecking; 
+	Segment 1{
+		Type TEST;
+		TestParams InitLoopCounter0;
+		Start true;
+		Title "InitLoopCounter0";
+		Override ;
+		Position 160,80;
+		Action  { 'Result==Fail'; Bin=21; }
+		Action  { 'Result==Pass'; Next=2; }
+	}
+	Segment 2{
+		Type TEST;
+		TestParams TCDT_CaptureStart;
+		Title "TCDT_CaptureStart";
+		Execute OFF;
+		Override ;
+		Position 360,80;
+		Action  { 'Result==Fail'; Bin=21; }
+		Action  { 'Result==Pass'; Next=3; }
+	}
+	Segment 3{
+		Type TEST;
+		TestParams KnownGoodState;
+		Title "KnownGoodState";
+		Override ;
+		Position 560,80;
+		Action  { 'Result==Fail'; Bin=80; }
+		Action  { 'Result==Pass'; Next=4; }
+	}
+	Segment 4{
+		Type TEST;
+		TestParams LoopCounterDisplay;
+		Title "LoopCounterDisplay";
+		Override ;
+		Position 760,80;
+		Action  { 'Result==Fail'; Bin=21; }
+		Action  { 'Result==Pass'; Next=5; }
+	}
+	Segment 5{
+		Type TEST;
+		TestParams Initialize;
+		Title "Initialize";
+		Override ;
+		Position 960,80;
+		Action  { 'Result==Fail'; Bin=21; }
+		Action  { 'Result==Pass'; Next=6; }
+	}
+	Segment 6{
+		Type TEST;
+		TestParams PowerOnPCIeDevice;
+		Title "PowerOnPCIeDevice";
+		Override ;
+		Position 1160,80;
+		Action  { 'Result==Pass'; Next=8; }
+		Action  { 'Result==Fail'; Next=25; }
+	}
+	Segment 8{
+		Type TEST;
+		TestParams DeviceOpen;
+		Title "DeviceOpen";
+		Override ;
+		Position 1360,80;
+		Action  { 'Result==Fail'; Bin=10; }
+		Action  { 'Result==Pass'; Next=9; }
+	}
+	Segment 9{
+		Type TEST;
+		TestParams IdentifyDevice;
+		Title "IdentifyDevice";
+		Override ;
+		Position 760,240;
+		Action  { 'Result==Fail'; Bin=2; }
+		Action  { 'Result==Pass'; Next=10; }
+	}
+	Segment 25{
+		Type TEST;
+		TestParams DeviceClose;
+		Title "DeviceClose";
+		Override ;
+		Position 760,840;
+		Action  { 'Result==Pass'; Next=26; }
+		Action  { 'Result==Fail'; Bin=80; }
+	}
+	Segment 26{
+		Type TEST;
+		TestParams PowerOffPCIeDevice;
+		Title "PowerOffPCIeDevice";
+		Override ;
+		Position 560,840;
+		Action  { 'Result==Fail'; Bin=80; }
+		Action  { 'Result==Pass'; Next=27; }
+	}
+	Segment 27{
+		Type TEST;
+		TestParams LoopCounterBranch;
+		Title "LoopCounterBranch";
+		Override ;
+		Position 360,840;
+		Action  { 'Result==Fail'; Next=4; }
+		Action  { 'Result==Pass'; Bin=1; }
+	}
+	Segment 28{
+		Type TEST;
+		TestParams TCDT_CaptureStop;
+		Title "TCDT_CaptureStop";
+		Execute OFF;
+		Override ;
+		Position 160,840;
+		Action  { 'Result==Fail'; Bin=21; }
+		Action  { 'Result==Pass'; Bin=1; }
+	}
+	Segment 10{
+		Type TEST;
+		TestParams Test_tm_perf_test_percent;
+		Title "Test_tm_perf_test_percent";
+		Position 160,400;
+		Action  { 'Result==Pass'; Bin=1; }
+		Action  { 'Result==Fail'; Bin=21; }
+	}
+	Segment 11{
+		Type TEST;
+		TestParams Test_tm_perf_test;
+		Title "Test_tm_perf_test";
+		Position 360,400;
+		Action  { 'Result==Pass'; Bin=1; }
+		Action  { 'Result==Fail'; Bin=21; }
+	}
+	Segment 12{
+		Type TEST;
+		TestParams Test_tm_perf_fa_wrc_test_n_percent;
+		Title "Test_tm_perf_fa_wrc_test_n_percent";
+		Position 560,400;
+		Action  { 'Result==Pass'; Bin=1; }
+		Action  { 'Result==Fail'; Bin=21; }
+	}
+	Segment 13{
+		Type TEST;
+		TestParams Test_tm_perf_hw_test;
+		Title "Test_tm_perf_hw_test";
+		Position 760,400;
+		Action  { 'Result==Pass'; Bin=1; }
+		Action  { 'Result==Fail'; Bin=21; }
+	}
+	Segment 14{
+		Type TEST;
+		TestParams Test_tm_perf_hw_test_percent;
+		Title "Test_tm_perf_hw_test_percent";
+		Position 960,400;
+		Action  { 'Result==Pass'; Bin=1; }
+		Action  { 'Result==Fail'; Bin=21; }
+	}
+	Segment 15{
+		Type TEST;
+		TestParams Test_tm_perf_enterprise_jedec;
+		Title "Test_tm_perf_enterprise_jedec";
+		Position 1160,400;
+		Action  { 'Result==Pass'; Bin=1; }
+		Action  { 'Result==Fail'; Bin=21; }
+	}
+	Segment 16{
+		Type TEST;
+		TestParams Test_tm_hw_user_write_buffer_set;
+		Title "Test_tm_hw_user_write_buffer_set";
+		Position 1360,400;
+		Action  { 'Result==Pass'; Bin=1; }
+		Action  { 'Result==Fail'; Bin=21; }
+	}
+	Segment 7{
+		Type TEST;
+		TestParams Test_tm_performance_test_init;
+		Title "Test_tm_performance_test_init";
+		Position 160,560;
+		Action  { 'Result==Pass'; Bin=1; }
+		Action  { 'Result==Fail'; Bin=21; }
+	}
+	Segment 17{
+		Type TEST;
+		TestParams Test_tm_j219a_ent_n_sequential;
+		Title "Test_tm_j219a_ent_n_sequential";
+		Position 360,560;
+		Action  { 'Result==Pass'; Bin=1; }
+		Action  { 'Result==Fail'; Bin=21; }
+	}
+	Segment 18{
+		Type TEST;
+		TestParams Test_tm_performance_test_summary;
+		Title "Test_tm_performance_test_summary";
+		Position 560,560;
+		Action HighCategoryPORT { 'Result==Pass'; Bin=1; }
+		Action LowCategoryPORT { 'Result==Pass'; Bin=1; }
+		Action MedCategoryPORT { 'Result==Pass'; Bin=1; }
+		Action FailPORT { 'Result==Fail'; Bin=21; }
+	}
+	Segment 19{
+		Type TEST;
+		TestParams Test_tm_init_workload;
+		Title "Test_tm_init_workload";
+		Position 760,560;
+		Action  { 'Result==Pass'; Bin=1; }
+		Action  { 'Result==Fail'; Bin=21; }
+	}
+	Segment 20{
+		Type TEST;
+		TestParams Test_tm_perf_time_temp_dps_test;
+		Title "Test_tm_perf_time_temp_dps_test";
+		Position 960,560;
+		Action  { 'Result==Pass'; Bin=1; }
+		Action  { 'Result==Fail'; Bin=21; }
+	}
+	Segment 21{
+		Type TEST;
+		TestParams Test_tm_perf_snia_test;
+		Title "Test_tm_perf_snia_test";
+		Position 1160,560;
+		Action  { 'Result==Pass'; Bin=1; }
+		Action  { 'Result==Fail'; Bin=21; }
+	}
+	Segment 22{
+		Type TEST;
+		TestParams Test_Check_SB;
+		Title "Test_Check_SB";
+		Position 1360,560;
+		Action  { 'Result==Pass'; Bin=1; }
+		Action  { 'Result==Fail'; Bin=21; }
+	}
+}
+ProgSeq "Start"{
+	 UserKeywords StrictTypeChecking; 
+}
+ProgSeq "Finish"{
+	 UserKeywords StrictTypeChecking; 
+}
+ProgSeq "Debug"{
+	 UserKeywords StrictTypeChecking; 
+}
+ProgramObjects {
+	ActivePinList DefaultPinList;
+	UserFileDir .\UserData/;
+}
